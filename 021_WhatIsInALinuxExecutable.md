@@ -1,7 +1,7 @@
 ```
 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 ---------+---------+---------+---------+---------X---------+---------+---------+---------+---------X
-$Lastupdate: 2021/11/01 11:16:18 $ T.AIHANA
+$Lastupdate: 2021/11/02 10:57:58 $ T.AIHANA
 ```
 * [目次](/README.md#目次)
 
@@ -241,5 +241,50 @@ xxd -s $((0x01e7)) ./hello | head -4
 00000217: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 ```
 
-これらは、はじめの方で `hello` をダンプしたときに見かけた文字列ですね！
+これらは、冒頭の方で `hello` をダンプしたときに見かけた文字列ですね！
 
+えっと、これが解決した謎の一つになります。
+Onto the next hundred or so.
+
+手作業でファイルの詳細を調べることは楽しかったです。
+実際に `xxd` コマンドを使って調べる方法を学びました（これは、たとえ GUI の16進数ビューアやエディタが利用できなくても、「核の冬」の中で間違いなく役に立つであろう知識です）。
+ここで実際に ELF 向けのパーサを作りたいと思うことでしょう。
+
+そこで「ELF をわかりやすく解析する（*demystify ELF*）ツール」を文字って、`delf` という名前のライブラリを作ろうと思います。
+
+```shell
+$ source $HOME/.cargo/env
+$ cargo install cargo-edit
+
+$ cargo new --lib delf
+    Created library `delf` package
+$ cd delf
+$ cargo add nom@5
+    Updating 'https://github.com/rust-lang/crates.io-index' index
+      Adding nom v5 to dependencies
+```
+
+ここでは、便宜上 `Input` と `Result` 型を持つ `parse` モジュールを追加することにします：
+
+```Rust
+// in `delf/src/lib.rs`
+
+mod parse;
+```
+
+```Rust
+// in `delf/src/pars.rs`
+pub type Input<'a> = &'a [u8];
+pub type Result<'a, O> = nom::IResult<Input<'a>, O, nom::error::VerboseError<Input<'a>>>;
+```
+
+`hello` の先頭から 16 バイト程度であれば簡単に解析できます：
+
+
+* FIXME（ELF64 File Header の図）
+
+前述のとおり、ここではビッグエンディアンの ELF や 32-bit の ELF について気にする必要はないので、いくつかの値はハードコーディングでも構いません。
+では始めましょう！
+
+```Rust
+```
